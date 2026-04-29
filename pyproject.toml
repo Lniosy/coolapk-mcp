@@ -1,0 +1,16 @@
+[project]
+name = "coolapk-mcp"
+version = "0.1.0"
+description = "酷安社区 MCP Server — AI 原生搜索工具"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0",
+    "httpx>=0.27",
+    "bcrypt>=4.0",
+    "pydantic>=2.0",
+    "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+coolapk = "coolapk_mcp.cli:cli"
+coolapk-mcp = "coolapk_mcp.server:main"
