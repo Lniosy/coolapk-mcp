@@ -4,6 +4,14 @@
 
 让 AI 工具（Claude Code、Cursor 等）直接调用酷安的搜索和浏览能力，作为社区信息源使用。
 
+## 快速开始
+
+```bash
+pip install -e .
+```
+
+需要 Python >= 3.10。
+
 ## 功能
 
 - **搜索** — 帖子、用户、话题、应用
@@ -20,7 +28,11 @@
 pip install -e .
 ```
 
-需要 Python >= 3.10。
+## Claude Code Skill（推荐）
+
+项目内置了 `.claude/skills/coolapk.md`，在 Claude Code 中直接作为 skill 使用。**比 MCP Server 更省 token** — CLI 调用无协议开销，输出更紧凑。
+
+将本项目 clone 到工作目录后，Claude Code 会自动识别 skill。
 
 ## MCP Server
 
