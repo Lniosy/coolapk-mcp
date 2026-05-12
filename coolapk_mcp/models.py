@@ -41,10 +41,6 @@ def _extract_pics(pic_arr: list[str] | str) -> list[str]:
     return []
 
 
-def _pic_count(raw: Any) -> int:
-    pics = raw if isinstance(raw, list) else _extract_pics(raw)
-    return len(pics) if pics else 0
-
 
 def _ensure_string(v: Any) -> str:
     """Convert None and other falsy values to empty string."""
@@ -68,7 +64,7 @@ class FeedModel(BaseModel):
     dateline: str = ""
     device: str = Field(alias="deviceTitle", default="")
     ip_location: str = Field(alias="ipLocation", default="")
-    image_count: int = 0
+    images: list[str] = Field(default_factory=list)
 
     @field_validator(
         "title",
@@ -116,7 +112,7 @@ class FeedModel(BaseModel):
             dateline=data.get("dateline", 0),
             deviceTitle=data.get("deviceTitle", ""),
             ipLocation=data.get("ipLocation", ""),
-            image_count=_pic_count(pics),
+            images=_extract_pics(pics),
         )
 
 
@@ -148,7 +144,7 @@ class FeedDetail(FeedModel):
             dateline=data.get("dateline", 0),
             deviceTitle=data.get("deviceTitle", ""),
             ipLocation=data.get("ipLocation", ""),
-            image_count=_pic_count(pics),
+            images=_extract_pics(pics),
             readNum=data.get("readNum", 0),
             source_feed=source_feed,
             replies=parsed_replies,
@@ -165,7 +161,7 @@ class ReplyModel(BaseModel):
     like_num: int = Field(alias="likenum", default=0)
     dateline: str = ""
     is_author: bool = Field(alias="isFeedAuthor", default=False)
-    image_count: int = 0
+    images: list[str] = Field(default_factory=list)
 
     @field_validator("message", "username", mode="before")
     @classmethod
@@ -199,7 +195,7 @@ class ReplyModel(BaseModel):
             likenum=data.get("likenum", 0),
             dateline=data.get("dateline", 0),
             isFeedAuthor=bool(data.get("isFeedAuthor", 0)),
-            image_count=_pic_count(pics),
+            images=_extract_pics(pics),
         )
 
 
