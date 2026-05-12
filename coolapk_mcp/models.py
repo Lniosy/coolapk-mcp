@@ -46,6 +46,13 @@ def _pic_count(raw: Any) -> int:
     return len(pics) if pics else 0
 
 
+def _ensure_string(v: Any) -> str:
+    """Convert None and other falsy values to empty string."""
+    if v is None:
+        return ""
+    return str(v) if not isinstance(v, str) else v
+
+
 class FeedModel(BaseModel):
     id: int = 0
     title: str = ""
@@ -62,6 +69,19 @@ class FeedModel(BaseModel):
     device: str = Field(alias="deviceTitle", default="")
     ip_location: str = Field(alias="ipLocation", default="")
     image_count: int = 0
+
+    @field_validator(
+        "title",
+        "message",
+        "username",
+        "device",
+        "ip_location",
+        "feed_type",
+        mode="before",
+    )
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
 
     @model_validator(mode="after")
     def _generate_content(self) -> FeedModel:
@@ -107,9 +127,7 @@ class FeedDetail(FeedModel):
     reply_count: int = 0
 
     @classmethod
-    def from_api(
-        cls, data: dict, replies: list[dict] | None = None
-    ) -> FeedDetail:
+    def from_api(cls, data: dict, replies: list[dict] | None = None) -> FeedDetail:
         user_info = data.get("userInfo") or {}
         pics = data.get("picArr") or data.get("pic") or []
         source = data.get("forwardSourceFeed")
@@ -148,6 +166,11 @@ class ReplyModel(BaseModel):
     dateline: str = ""
     is_author: bool = Field(alias="isFeedAuthor", default=False)
     image_count: int = 0
+
+    @field_validator("message", "username", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
 
     @model_validator(mode="after")
     def _generate_content(self) -> ReplyModel:
@@ -193,6 +216,11 @@ class UserModel(BaseModel):
     city: str = ""
     gender: str = ""
 
+    @field_validator("username", "bio", "verify_title", "city", "gender", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
+
     @field_validator("reg_date", mode="before")
     @classmethod
     def _format_regdate(cls, v: Any) -> str:
@@ -235,6 +263,11 @@ class TopicModel(BaseModel):
     comment_num: int = Field(alias="commentnum", default=0)
     description: str = ""
 
+    @field_validator("title", "tag", "description", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
+
     @classmethod
     def from_api(cls, data: dict) -> TopicModel:
         return cls(
@@ -259,6 +292,11 @@ class AppModel(BaseModel):
     follow_num: int = Field(alias="followNum", default=0)
     download_num: int = Field(alias="downloadCount", default=0)
     version: str = Field(alias="versionName", default="")
+
+    @field_validator("title", "package_name", "description", "version", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
 
     @classmethod
     def from_api(cls, data: dict) -> AppModel:
