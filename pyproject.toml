@@ -14,3 +14,6 @@ dependencies = [
 [project.scripts]
 coolapk = "coolapk_mcp.cli:cli"
 coolapk-mcp = "coolapk_mcp.server:main"
+
+[tool.setuptools.packages.find]
+include = ["coolapk_mcp*"]

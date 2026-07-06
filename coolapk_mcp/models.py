@@ -305,3 +305,81 @@ class AppModel(BaseModel):
             downloadCount=data.get("downloadCount", 0) or data.get("downloadnum", 0),
             versionName=data.get("versionName", ""),
         )
+
+
+class MessageModel(BaseModel):
+    """私信消息模型"""
+    id: int = 0
+    uid: int = 0
+    username: str = ""
+    ukey: str = ""
+    message: str = ""
+    dateline: str = ""
+    is_me: bool = Field(alias="isMe", default=False)
+    pic: str = ""
+
+    @field_validator("username", "message", "ukey", "pic", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
+
+    @field_validator("dateline", mode="before")
+    @classmethod
+    def _format_dateline(cls, v: Any) -> str:
+        if isinstance(v, str) and v.lstrip("-").isdigit():
+            v = int(v)
+        if isinstance(v, (int, float)) and v:
+            return _format_time(v)
+        return str(v) if v else ""
+
+    @classmethod
+    def from_api(cls, data: dict) -> MessageModel:
+        user_info = data.get("userInfo") or {}
+        return cls(
+            id=data.get("id", 0),
+            uid=data.get("uid", 0) or user_info.get("uid", 0),
+            username=user_info.get("username", "") or data.get("username", ""),
+            ukey=data.get("ukey", ""),
+            message=data.get("message", ""),
+            dateline=data.get("dateline", 0),
+            isMe=bool(data.get("isMe", 0)),
+            pic=data.get("messagePic", "") or data.get("pic", ""),
+        )
+
+
+class ChatSessionModel(BaseModel):
+    """私信会话列表条目"""
+    uid: int = 0
+    username: str = ""
+    ukey: str = ""
+    last_message: str = Field(alias="lastMessage", default="")
+    dateline: str = ""
+    unread: int = 0
+    avatar: str = ""
+
+    @field_validator("username", "ukey", "last_message", "avatar", mode="before")
+    @classmethod
+    def _ensure_string_fields(cls, v: Any) -> str:
+        return _ensure_string(v)
+
+    @field_validator("dateline", mode="before")
+    @classmethod
+    def _format_dateline(cls, v: Any) -> str:
+        if isinstance(v, str) and v.lstrip("-").isdigit():
+            v = int(v)
+        if isinstance(v, (int, float)) and v:
+            return _format_time(v)
+        return str(v) if v else ""
+
+    @classmethod
+    def from_api(cls, data: dict) -> ChatSessionModel:
+        user_info = data.get("userInfo") or {}
+        return cls(
+            uid=data.get("uid", 0) or user_info.get("uid", 0),
+            username=user_info.get("username", "") or data.get("username", ""),
+            ukey=data.get("ukey", ""),
+            lastMessage=data.get("lastMessage", "") or data.get("message", ""),
+            dateline=data.get("dateline", 0) or data.get("lastDateline", 0),
+            unread=data.get("unreadNum", 0) or data.get("unread", 0),
+            avatar=user_info.get("userSmallAvatar", "") or data.get("avatar", ""),
+        )

@@ -19,3 +19,6 @@ venv/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 临时脚本
+scripts/tmp/

@@ -1,36 +1,21 @@
-"""设备码生成 — 精确对应 DeviceInfo.CreateDeviceCode()"""
+"""设备码生成 — 对应 DeviceInfo.CreateDeviceCode()
 
-import base64
-import random
+注意：v3 token 写操作实测可用 qiuyurs 仓库的默认 device 码（2026-07-06 验证）。
+该 device 码已在酷安 v16.2.0 上验证 like/follow/message 等写操作成功。
+"""
 
-
-def _random_hex(length: int = 16) -> str:
-    """生成随机十六进制大写字符串
-    对应 C# RandHexString：BitConverter.ToString(bytes).Replace("-", "")
-    """
-    return "".join(f"{random.randint(0, 255):02X}" for _ in range(length))
-
-
-def _random_mac() -> str:
-    """生成随机 MAC 地址
-    对应 C# RandMacAddress：小写十六进制，冒号分隔
-    """
-    octets = [random.randint(0, 255) for _ in range(6)]
-    return ":".join(f"{o:02x}" for o in octets)
+# 已验证可用的默认 device 码（来源：qiuyurs/coolApkAPI 仓库）
+# 实测：配合 v3 token + 真实 cookie，读+写操作均成功
+DEFAULT_DEVICE_CODE = (
+    "AZmV2N4UzN0UmZ3kDOzEzYgsjMwAjL2IjMwUjMuE0MRFEI7MkMxITM4AjMyAyOp1GZlJFI7kWbvFWaYByO"
+    "gsDI7AyOzYGO3okVq1GWOlEez8WYLlkWKVWbllzX3pUTjFTcjx2aPVFR"
+)
 
 
 def generate_device_code() -> str:
-    """
-    生成 DeviceCode。精确对应 DeviceInfo.ToString().GetBase64().Reverse()
+    """返回已验证可用的默认 device 码。
 
-    ToString() 格式（string.Join("; ", ...)）：
-    "{AndroidID}; {空}; {空}; {MAC}; {厂商}; {品牌}; {型号}; {BuildNumber}; null"
-
-    然后 Base64 编码（去=）再反转字符串。
+    之前用随机生成的假设备码，读操作可用但写操作不可靠。
+    2026-07-06 改用 qiuyurs 仓库验证过的 device 码，读+写均稳定。
     """
-    aid = _random_hex(16)
-    mac = _random_mac()
-    parts = [aid, "", "", mac, "Apple", "Apple", "macOS", "10.15.7", "null"]
-    raw = "; ".join(parts)
-    encoded = base64.b64encode(raw.encode("utf-8")).decode().rstrip("=")
-    return encoded[::-1]
+    return DEFAULT_DEVICE_CODE
