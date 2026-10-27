@@ -181,6 +181,62 @@ async def feed(feed_id, replies, reply_page, feed_type):
     _output(detail)
 
 
+@cli.command("comments")
+@click.argument("feed_id", type=int)
+@click.option("--page", default=1, type=int, help="热门评论页码")
+@click.option("--no-body", is_flag=True, help="跳过正文恢复")
+@async_command
+async def comments(feed_id, page, no_body):
+    """帖子热门评论。feed/detail 与 replyList 被风控时的替代链路：
+    hotReplyList 拿热门评论，正文用评论里的 feedUid 反查作者动态列表恢复。
+    """
+    async with CoolapkClient() as client:
+        raw = await client.get_hot_replies(feed_id, page)
+        if not isinstance(raw, list):
+            _output(raw)
+            return
+        replies = [ReplyModel.from_api(r) if isinstance(r, dict) else r for r in raw]
+        body = None
+        author_uid = raw[0].get("feedUid") if raw and isinstance(raw[0], dict) else None
+        if not no_body and author_uid:
+            for p in range(1, 6):
+                feeds = await client.get_user_feeds(int(author_uid), p)
+                if not isinstance(feeds, list):
+                    break
+                hit = next(
+                    (f for f in feeds if str(f.get("id")) == str(feed_id)), None
+                )
+                if hit is not None:
+                    body = FeedModel.from_api(hit)
+                    break
+                if not feeds:
+                    break
+        _output({
+            "feed_id": feed_id,
+            "page": page,
+            "reply_count": len(replies),
+            "body": _dump(body) if body else None,
+            "hot_replies": [_dump(r) for r in replies],
+        })
+
+
+@cli.command("app")
+@click.argument("package_name")
+@async_command
+async def app(package_name):
+    """应用详情（版本/体积/开发者/评论数等，按包名查询）"""
+    async with CoolapkClient() as client:
+        raw = await client.get_app_detail(package_name)
+    if not isinstance(raw, dict):
+        _output(raw)
+        return
+    keys = (
+        "title", "subtitle", "apkname", "apkversionname", "apksize",
+        "developername", "follownum", "commentnum", "lastupdate", "logo",
+    )
+    _output({k: raw[k] for k in keys if raw.get(k) not in (None, "")})
+
+
 # ---- 搜索 ----
 
 

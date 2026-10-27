@@ -108,7 +108,7 @@ pip install -e .
 
 ### Claude Code Skill（更省 token）
 
-项目内置 `.claude/skills/coolapk.md`，clone 进工作目录后 Claude Code 可直接当 skill 用；CLI 无协议开销，输出更紧凑。
+项目内置 `.claude/skills/coolapk/SKILL.md`，clone 进工作目录后 Claude Code 可直接当 skill 用；CLI 无协议开销，输出更紧凑。
 
 ### 注册的 MCP Tools
 
@@ -135,6 +135,9 @@ coolapk user <UID> --feeds
 coolapk home --tab hot
 coolapk topic "小米解锁BL"
 coolapk topic "小米解锁BL" --feeds
+coolapk comments <帖子ID>              # 热门评论 + 正文恢复（detail 被风控时的替代链路）
+coolapk comments <帖子ID> --page 2 --no-body
+coolapk app com.tencent.mm             # 应用详情（按包名）
 ```
 
 ### 交互操作（需登录）
@@ -174,7 +177,7 @@ coolapk follow <UID>
 
 ## 已知限制
 
-- **`/v6/feed/detail` 验证码**：新版酷安对详情接口风控更严，部分环境会稳定返回 `err_request_captcha_v2`；搜索、列表、用户动态、评论等读接口通常仍可用。详见 [#5](https://github.com/Lniosy/coolapk-mcp/issues/5)。临时思路：从作者动态列表按 ID 回落读公开帖（不保证字段完整）。
+- **`/v6/feed/detail` 验证码**：新版酷安对详情接口风控更严，部分环境会稳定返回 `err_request_captcha_v2`；搜索、列表、用户动态、评论等读接口通常仍可用。详见 [#5](https://github.com/Lniosy/coolapk-mcp/issues/5)。`comments` 命令已内置该替代链路：`hotReplyList` 拿热门评论，正文从作者动态列表按 ID 恢复（老帖可能找不回）。
 - 请合理使用接口频率，遵守酷安用户协议与当地法规；本项目仅作个人/研究向信息检索，不提供绕过风控或破解软件相关能力。
 
 ## 技术实现（简述）

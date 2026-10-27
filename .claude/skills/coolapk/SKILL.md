@@ -51,6 +51,26 @@ coolapk feed <帖子ID> --no-replies
 coolapk feed <帖子ID> --reply-page 2
 ```
 
+> `feed/detail` 部分环境会被酷安风控（验证码，见 issue #5），报错时改用下面的 `comments`。
+
+### 热门评论（detail 被风控时的替代链路）
+
+```bash
+# 热门评论 + 经作者动态列表恢复正文
+coolapk comments <帖子ID>
+
+# 翻页 / 只看评论不恢复正文
+coolapk comments <帖子ID> --page 2
+coolapk comments <帖子ID> --no-body
+```
+
+### 应用详情
+
+```bash
+# 按包名查询（版本/体积/开发者/评论数）
+coolapk app com.tencent.mm
+```
+
 ### 用户
 
 ```bash
@@ -126,4 +146,5 @@ coolapk notify message
 - 首次运行会自动生成设备码并保存到 ~/.coolapk-mcp/config.json
 - 搜索和浏览不需要登录
 - 点赞、回复、关注等交互操作需要先登录
+- `comments` 走热门评论接口，无热评的帖子返回空列表（此时也拿不到正文）
 - 所有输出为精简 JSON，自动排除空值字段节省 token

@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import httpx
 
+from coolapk_mcp.auth.token import generate_token as generate_token_v2
 from coolapk_mcp.auth.token_v3 import DEFAULT_APP_VERSION, DEFAULT_VERSION_CODE, generate_token_v3
 from coolapk_mcp.config import AppConfig
 
@@ -27,10 +28,11 @@ class CoolapkClient:
     def __init__(self, config: AppConfig | None = None):
         self.config = config or AppConfig.load()
         self._client = httpx.AsyncClient(timeout=30.0)
+        self._use_v2_token = False
 
     def _build_headers(self) -> dict[str, str]:
-        """组装请求头，每次请求重新生成 X-App-Token（v3 算法）"""
-        token, _ = generate_token_v3(self.config.device_code)
+        """组装请求头，每次请求重新生成 X-App-Token（v3 优先，未提取 libauth blob 时回退 v2）"""
+        token = self._generate_token()
         return {
             "X-Sdk-Int": "35",
             "X-Sdk-Locale": "zh-CN",
@@ -51,6 +53,14 @@ class CoolapkClient:
                 f"+CoolMarket/{DEFAULT_APP_VERSION}-{DEFAULT_VERSION_CODE}-universal"
             ),
         }
+
+    def _generate_token(self) -> str:
+        if not self._use_v2_token:
+            try:
+                return generate_token_v3(self.config.device_code)[0]
+            except RuntimeError:
+                self._use_v2_token = True
+        return generate_token_v2(self.config.device_code)
 
     def _get_cookie_header(self) -> str | None:
         """返回 Cookie 字符串。直接拼字符串避免 httpx cookies 参数对中文 username 的编码问题。"""
