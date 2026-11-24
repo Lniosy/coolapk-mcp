@@ -14,6 +14,7 @@
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-%3E%3D3.10-blue?style=flat-square&logo=python&logoColor=white" alt="Python"/></a>
   <a href="#mcp-server"><img src="https://img.shields.io/badge/MCP-Server-0ea5e9?style=flat-square" alt="MCP"/></a>
   <a href="#cursor--claude-配置"><img src="https://img.shields.io/badge/Cursor-Ready-black?style=flat-square" alt="Cursor"/></a>
+  <a href="https://x.com/Lniosytest"><img src="https://img.shields.io/badge/Follow-%40Lniosytest-black?style=flat-square&logo=x&logoColor=white" alt="Follow @Lniosytest on X"/></a>
 </p>
 
 <p align="center">
@@ -200,6 +201,12 @@ coolapk_mcp/
 
 - API 参考了 [Coolapk-UWP/Coolapk-Lite](https://github.com/Coolapk-UWP/Coolapk-Lite)
 - 生态适配：[mcxen/qx](https://github.com/mcxen/qx) · [mcxen/qx-plugins](https://github.com/mcxen/qx-plugins)（qxcoolapk）
+
+## 关注作者
+
+李天才（[@Lniosytest](https://x.com/Lniosytest)）在 X 上持续分享 MCP 工具、AI 编程工作流与独立开发开源项目，欢迎关注获取更新。
+
+个人站：[litiancai.vercel.app](https://litiancai.vercel.app)
 
 ## License
 
